@@ -21,14 +21,13 @@ export default function ScanScreen() {
 
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        let id = (Math.random() + 1).toString(36).substring(7);
         let date = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
-        let dataSave = {}
-        dataSave[id] = { 'code': data, 'date': date }
+        let dataSave = [];
+        dataSave.push({ 'code': data, 'date': date });
         AsyncStorage.getItem('data')
             .then((dataStorage) => {
                 const tempData = JSON.parse(dataStorage);
-                Object.assign(tempData,dataSave)
+                tempData.push(dataSave[0])
                 AsyncStorage.setItem('data', JSON.stringify(tempData));
             })
             .catch(() => {
