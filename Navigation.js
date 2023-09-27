@@ -1,39 +1,44 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
 import ScanScreen from './screens/ScanScreen';
 import SendScreen from './screens/SendScreen';
+import Colors from './colors';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
     return (
         <Tab.Navigator
-            initialRouteName="Opciones"
+            initialRouteName='Menu'
             screenOptions={{
-                tabBarActiveTintColor: 'red'
+                tabBarActiveTintColor: Colors.primary
             }}
         >
             <Tab.Screen
-                name="Opciones"
+                name='Menu'
                 component={SendScreen}
                 options={{
-                    tabBarLabel: 'Opciones',
+                    headerTintColor: Colors.primary,
+                    headerTitleAlign: 'center',
+                    tabBarLabel: 'Menu',
                     tabBarIcon: ({ color, size }) => (
-                        <Feather name="send" size={size} color={color} />
+                        <Feather name='send' size={size} color={color} />
                     )
                 }}
             />
             <Tab.Screen
-                name="Scanner"
+                name='Scanner'
                 component={ScanScreen}
                 options={{
+                    headerTintColor: Colors.primary,
+                    headerTitleAlign: 'center',
                     tabBarLabel: 'Scanner',
                     tabBarIcon: ({ color, size }) => (
-                        <AntDesign name="scan1" size={size} color={color} />
+                        <AntDesign name='scan1' size={size} color={color} />
                     )
                 }}
             />

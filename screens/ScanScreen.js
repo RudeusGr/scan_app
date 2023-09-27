@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useIsFocused } from '@react-navigation/native';
+
+import colors from '../colors';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function ScanScreen() {
     const [hasPermission, setHasPermission] = useState(null);
@@ -45,7 +48,10 @@ export default function ScanScreen() {
 
                 />
             )}
-            {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+            {scanned && <TouchableHighlight onPress={() => setScanned(false)} style={styles.scanBtn} underlayColor={colors.secondary}>
+                <Text style={styles.textBtn}>Escanear</Text>
+            </TouchableHighlight>
+            }
         </View>
     );
 }
@@ -53,7 +59,21 @@ export default function ScanScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
+        backgroundColor: colors.white,
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: 10
     },
+    scanBtn: {
+        width: '80%',
+        borderRadius: 25,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.primary,
+    },
+    textBtn: {
+        color: colors.white,
+        fontSize: 16
+    }
 });
