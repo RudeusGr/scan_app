@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Colors from "../colors";
 import colors from '../colors';
 
 const sendData = () => {
-    alert('Enviando datos');
+    AsyncStorage.clear();
+    alert('Datos borrados');
 }
 
 const viewData = () => {
-    alert('Mostrando datos');
+    AsyncStorage.getItem('data')
+        .then((data) => {
+            if (JSON.parse(data) != null) {
+                alert('Informacion guardada:\n' + JSON.parse(data));
+                console.log(JSON.parse(data));
+            } else {
+                alert('No hay datos que mostrar')
+            }
+        })
 }
 
 export default function SendScreen() {

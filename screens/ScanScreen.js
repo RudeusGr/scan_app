@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import colors from '../colors';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import Colors from '../colors';
 
 export default function ScanScreen() {
     const [hasPermission, setHasPermission] = useState(null);
@@ -21,7 +21,20 @@ export default function ScanScreen() {
 
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        let id = (Math.random() + 1).toString(36).substring(7);
+        let date = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+        let dataSave = {}
+        dataSave[id] = { 'code': data, 'date': date }
+        AsyncStorage.getItem('data')
+            .then((dataStorage) => {
+                const tempData = JSON.parse(dataStorage);
+                Object.assign(tempData,dataSave)
+                AsyncStorage.setItem('data', JSON.stringify(tempData));
+            })
+            .catch(() => {
+                AsyncStorage.setItem('data', JSON.stringify(dataSave));
+            })
+        alert(`Se escaneo el codigo ${data} con fecha de ${date}`);
     };
 
     if (hasPermission === null) {
@@ -48,7 +61,7 @@ export default function ScanScreen() {
 
                 />
             )}
-            {scanned && <TouchableHighlight onPress={() => setScanned(false)} style={styles.scanBtn} underlayColor={colors.secondary}>
+            {scanned && <TouchableHighlight onPress={() => setScanned(false)} style={styles.scanBtn} underlayColor={Colors.secondary}>
                 <Text style={styles.textBtn}>Escanear</Text>
             </TouchableHighlight>
             }
@@ -59,7 +72,7 @@ export default function ScanScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.white,
+        backgroundColor: Colors.white,
         alignItems: 'center',
         justifyContent: 'flex-end',
         padding: 10
@@ -70,10 +83,10 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.primary,
+        backgroundColor: Colors.primary,
     },
     textBtn: {
-        color: colors.white,
+        color: Colors.white,
         fontSize: 16
     }
 });
