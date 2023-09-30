@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, TouchableHighlight, Image, FlatList, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, TouchableHighlight, Image, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from "react-native-modal";
 
@@ -9,27 +9,61 @@ export default function SendScreen() {
 
     const [isModalVisible, setModalVisible] = useState(false);
 
-    const [storage, setStorage] = useState(null);
+    const [storage, setStorage] = useState([]);
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
-    const sendData = () => {
-        AsyncStorage.clear();
-        alert('Datos borrados');
+    const viewData = async () => {
+        try {
+            const storageData = await AsyncStorage.getItem('data');
+            if (storageData == null) {
+                alert('No hay datos que mostrar');
+            } else {
+                setStorage(JSON.parse(storageData));
+                toggleModal();
+            }
+        } catch (err) {
+            alert('No hay datos para mostrar');
+        }
     }
 
-    const viewData = () => {
-        AsyncStorage.getItem('data')
-            .then((data) => {
-                if (JSON.parse(data) != null) {
-                    setStorage(JSON.parse(data));
-                    toggleModal();
-                } else {
-                    alert('No hay datos que mostrar')
-                }
-            })
+    const sendMail = async () => {
+        try {
+            const storageData = await AsyncStorage.getItem('data');
+            if (storageData == null) {
+                alert('No hay datos para enviar');
+            } else {
+                const json = await JSON.parse(storageData);
+                let data = '';
+                let index = 1;
+                json.forEach(element => {
+                    data += 'index=' + index + '&code=' + element.code + '&date=' + element.date + '&';
+                    index++;
+                });
+
+                data = data.substring(0, data.length - 1);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "https://script.google.com/macros/s/AKfycbzGbuiGxl9PF-NVGNxYuySnhrJ_h5HDC4xIHGvxw2NJ0VZsUbafON59BD1_jqRbr7Y3HQ/exec", true);
+
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                xhr.send(data);
+
+                xhr.onload = function () {
+                    if (xhr.status != 200) {
+                        alert(`Error ${xhr.status}: ${xhr.statusText}`);
+                    } else {
+                        alert(`Datos enviados`);
+                        AsyncStorage.removeItem('data');
+                    }
+                };
+            }
+        } catch (err) {
+            alert('No hay datos registrados');
+        }
     }
 
     const Item = ({ data }) => (
@@ -47,7 +81,7 @@ export default function SendScreen() {
                 source={require('../assets/gm-logo.png')}
             />
 
-            <TouchableHighlight onPress={sendData} style={styles.scanBtn} underlayColor={Colors.secondary}>
+            <TouchableHighlight onPress={sendMail} style={styles.scanBtn} underlayColor={Colors.secondary}>
                 <Text style={styles.textBtn}>Enviar Datos</Text>
             </TouchableHighlight>
 
