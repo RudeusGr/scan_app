@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
-import Navigation from './Navigation';
+import { StyleSheet, Text, View } from 'react-native'
+import Navigation from './Navigation'
 
-export default function App() {
+export default function App () {
   return (
     <Navigation />
-  );
+  )
 }
-

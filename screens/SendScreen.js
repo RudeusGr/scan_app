@@ -1,84 +1,82 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableHighlight, Image, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Modal from "react-native-modal";
+import React, { useState } from 'react'
+import { Text, View, StyleSheet, TouchableHighlight, Image, FlatList } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Modal from 'react-native-modal'
+import Colors from '../colors'
 
-import Colors from "../colors";
+export default function SendScreen () {
+  const [isModalVisible, setModalVisible] = useState(false)
 
-export default function SendScreen() {
+  const [storage, setStorage] = useState([])
 
-    const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible)
+  }
 
-    const [storage, setStorage] = useState([]);
-
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
-
-    const viewData = async () => {
-        try {
-            const storageData = await AsyncStorage.getItem('data');
-            if (storageData == null) {
-                alert('No hay datos que mostrar');
-            } else {
-                setStorage(JSON.parse(storageData));
-                toggleModal();
-            }
-        } catch (err) {
-            alert('No hay datos para mostrar');
-        }
+  const viewData = async () => {
+    try {
+      const storageData = await AsyncStorage.getItem('data')
+      if (storageData == null) {
+        alert('No hay datos que mostrar')
+      } else {
+        setStorage(JSON.parse(storageData))
+        toggleModal()
+      }
+    } catch (err) {
+      alert('No hay datos para mostrar')
     }
+  }
 
-    const sendMail = async () => {
-        try {
-            const storageData = await AsyncStorage.getItem('data');
-            if (storageData == null) {
-                alert('No hay datos para enviar');
-            } else {
-                const json = await JSON.parse(storageData);
-                let data = '';
-                let index = 1;
-                json.forEach(element => {
-                    data += 'index=' + index + '&code=' + element.code + '&date=' + element.date + '&';
-                    index++;
-                });
+  const sendMail = async () => {
+    try {
+      const storageData = await AsyncStorage.getItem('data')
+      if (storageData == null) {
+        alert('No hay datos para enviar')
+      } else {
+        const json = await JSON.parse(storageData)
+        let data = ''
+        let index = 1
+        json.forEach(element => {
+          data += 'index=' + index + '&code=' + element.code + '&date=' + element.date + '&'
+          index++
+        })
 
-                data = data.substring(0, data.length - 1);
+        data = data.substring(0, data.length - 1)
 
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://script.google.com/macros/s/AKfycbzGbuiGxl9PF-NVGNxYuySnhrJ_h5HDC4xIHGvxw2NJ0VZsUbafON59BD1_jqRbr7Y3HQ/exec", true);
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', 'https://script.google.com/macros/s/AKfycbxlKcTD6pInK1ln8MbX9EBKCWGkKVAed0R7clJ4Y6qNM_3FQzdWr1D4CgOOJSHc5kcyww/exec', true)
 
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 
-                xhr.send(data);
+        xhr.send(data)
 
-                xhr.onload = function () {
-                    if (xhr.status != 200) {
-                        alert(`Error ${xhr.status}: ${xhr.statusText}`);
-                    } else {
-                        alert(`Datos enviados`);
-                        AsyncStorage.removeItem('data');
-                    }
-                };
-            }
-        } catch (err) {
-            alert('No hay datos registrados');
+        xhr.onloadend = function () {
+          if (xhr.status != 200) {
+            alert(`Error ${xhr.status}: ${xhr.statusText}`)
+          } else {
+            alert('Datos enviados')
+            AsyncStorage.removeItem('data')
+          }
         }
+      }
+    } catch (err) {
+      alert('No hay datos registrados')
     }
+  }
 
-    const Item = ({ data }) => (
+  const Item = ({ data }) => (
         <View style={styles.item}>
             <Text style={styles.itemTitle}>Registro {data.index}:</Text>
             <Text style={styles.itemText}>Codigo: {data.item.code}</Text>
             <Text style={styles.itemText}>Fecha: {data.item.date}</Text>
         </View>
-    );
+  )
 
-    return (
+  return (
         <View style={styles.container}>
             <Image
                 style={{ width: 200, height: 200, marginBottom: 15 }}
-                source={require('../assets/gm-logo.png')}
+                source={require('../assets/logo.png')}
             />
 
             <TouchableHighlight onPress={sendMail} style={styles.scanBtn} underlayColor={Colors.secondary}>
@@ -104,52 +102,52 @@ export default function SendScreen() {
                 </View>
             </Modal>
         </View>
-    )
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.white,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10
-    },
-    scrollView: {
-        flex: 1,
-        width: '100%',
-        height: '80%',
-        backgroundColor: Colors.white,
-        padding: 10
-    },
-    scanBtn: {
-        width: '80%',
-        borderRadius: 25,
-        height: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.primary,
-        margin: 10
-    },
-    textBtn: {
-        color: Colors.white,
-        fontSize: 16
-    },
-    item: {
-        width: '90%',
-        borderRadius: 25,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.primary,
-        marginBottom: 10
-    },
-    itemText: {
-        color: Colors.white,
-        fontSize: 12
-    },
-    itemTitle: {
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: 'bold'
-    }
-});
+  container: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10
+  },
+  scrollView: {
+    flex: 1,
+    width: '100%',
+    height: '80%',
+    backgroundColor: Colors.white,
+    padding: 10
+  },
+  scanBtn: {
+    width: '80%',
+    borderRadius: 25,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    margin: 10
+  },
+  textBtn: {
+    color: Colors.white,
+    fontSize: 16
+  },
+  item: {
+    width: '90%',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    marginBottom: 10
+  },
+  itemText: {
+    color: Colors.white,
+    fontSize: 12
+  },
+  itemTitle: {
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: 'bold'
+  }
+})
